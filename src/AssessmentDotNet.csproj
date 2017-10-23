@@ -60,6 +60,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\DotNetWikiBotExtensions.cs" />
     <Compile Include="Models\Article.cs" />
     <Compile Include="Models\AssessmentCategoryInfo.cs" />
     <Compile Include="Helpers\DotNetWikiBot.cs" />

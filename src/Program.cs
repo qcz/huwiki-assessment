@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using DotNetWikiBot;
+using AssessmentDotNet.Helpers;
 
 namespace AssessmentDotNet
 {
@@ -144,23 +145,23 @@ namespace AssessmentDotNet
 					Console.WriteLine(xCat + " szócikkek kategóriáinak létrehozása...");
 
 					Page xMainCat = new Page(huwiki, "Kategória:" + xCat + " szócikkek minőség szerint");
-					xMainCat.Save("[[Kategória:Wikipédia-cikkértékelés]]", "Bot: Cikkértékelési kategória létrehozása", true);
+					xMainCat.SaveWithRetries("[[Kategória:Wikipédia-cikkértékelés]]", "Bot: Cikkértékelési kategória létrehozása", true);
 					Page xImpCat = new Page(huwiki, "Kategória:" + xCat + " szócikkek fontosság szerint");
-					xImpCat.Save("[[Kategória:Wikipédia-cikkértékelés]]", "Bot: Cikkértékelési kategória létrehozása", true);
+					xImpCat.SaveWithRetries("[[Kategória:Wikipédia-cikkértékelés]]", "Bot: Cikkértékelési kategória létrehozása", true);
 					for (int i = 0; i < 8; i++)
 					{
 						Page xQualSubCat = new Page(huwiki, "Kategória:" + quals[i] + " " + xCat + " szócikkek");
-						xQualSubCat.Save("[[Kategória:" + xCat + " szócikkek minőség szerint|" + i.ToString() + "]]",
+						xQualSubCat.SaveWithRetries("[[Kategória:" + xCat + " szócikkek minőség szerint|" + i.ToString() + "]]",
 							"Bot: Cikkértékelési kategória létrehozása", true);
 					}
 					for (int i = 1; i <= 4; i++)
 					{
 						Page xImpSubCat = new Page(huwiki, "Kategória:" + imps[i - 1] + " " + xCat + " szócikkek");
-						xImpSubCat.Save("[[Kategória:" + xCat + " szócikkek fontosság szerint|" + i.ToString() + "]]",
+						xImpSubCat.SaveWithRetries("[[Kategória:" + xCat + " szócikkek fontosság szerint|" + i.ToString() + "]]",
 							"Bot: Cikkértékelési kategória létrehozása", true);
 					}
 					Page dataPage = new Page("Wikipédia:Cikkértékelési műhely/" + xCat.ToUpperFirst() + " szócikkek/Beállítások");
-					dataPage.Save(@"{{#switch:{{{1}}}
+					dataPage.SaveWithRetries(@"{{#switch:{{{1}}}
 | ikon = Antialias Icon.svg
 | műhely = 
 | portál = 
@@ -295,7 +296,7 @@ namespace AssessmentDotNet
 						Console.WriteLine("Statisztika elmentése ...");
 						Page catStat = new Page(huwiki, string.Format(WPAssessmentCore, key) + StatisticsPage);
 						//catStat.Load();
-						catStat.Save(PrintStat(counter, key), "Bot: statisztika " + DateTime.Today.ToString("yyyy-MM-dd") + "-i frissítése", false);
+						catStat.SaveWithRetries(PrintStat(counter, key), "Bot: statisztika " + DateTime.Today.ToString("yyyy-MM-dd") + "-i frissítése", false);
 
 						// Szócikklisták és index elmentése
 						if (newArts.Keys.Count > 80)
@@ -306,7 +307,7 @@ namespace AssessmentDotNet
 								"\n{{Cikkértékelés/Indexlábléc | összesen = " + newArts.Count.ToString() + "}}";
 
 							Page botSavePage = new Page(huwiki, "Wikipédia:Cikkértékelési műhely/" + key + " szócikkek/Bot");
-							botSavePage.Save(
+							botSavePage.SaveWithRetries(
 								"{{#switch:{{{1|}}}\n |bot=" + huwiki.userName + "\n |dátum=" + DateTime.Today.ToString("yyyy-MM-dd") + "\n}}",
 								"Bot: lap frissítése",
 								false);
@@ -314,7 +315,7 @@ namespace AssessmentDotNet
 
 							Console.WriteLine("A témakör indexének elmentése ...");
 							Page assessmentIndex = new Page(huwiki, string.Format(WPAssessmentCore, key));
-							assessmentIndex.Save(index, "Bot: témakör indexének frissítése", false);
+							assessmentIndex.SaveWithRetries(index, "Bot: témakör indexének frissítése", false);
 						}
 						else
 						{
@@ -328,7 +329,7 @@ namespace AssessmentDotNet
 					{
 						Console.WriteLine("Napló elmentése ...");
 						Page logPage = new Page(huwiki, string.Format(WPAssessmentCore + LogPage, key));
-						logPage.Save(log, "Bot: futtatás naplózása", false);
+						logPage.SaveWithRetries(log, "Bot: futtatás naplózása", false);
 					}
 
 					// Adatok elmentése XML-be
@@ -352,7 +353,7 @@ namespace AssessmentDotNet
 				// Összesített statisztika elmentése
 				Console.WriteLine("Összesített statisztika elmentése ...");
 				Page allStat = new Page(huwiki, WPAssessment + StatisticsPage);
-				allStat.Save(PrintStat(allCounter, ""), "Bot: összesített statisztika " + DateTime.Today.ToString("yyyy-MM-dd") + "-i frissítése", false);
+				allStat.SaveWithRetries(PrintStat(allCounter, ""), "Bot: összesített statisztika " + DateTime.Today.ToString("yyyy-MM-dd") + "-i frissítése", false);
 
 				// Index elmentése
 				Console.WriteLine("Cikkértékelés indexének elmentése ...");
@@ -369,7 +370,7 @@ namespace AssessmentDotNet
 						list += "{{Cikkértékelés/Index | téma = " + s + " | ellenőrzött = " + categories[s].AssessedArticles + " | összesen = " + categories[s].AllArticles + "}}\n";
 					}
 				}
-				p.Save(m.Groups["pre"].Value + validCats + m.Groups["inner"].Value + list + m.Groups["after"].Value, "Bot: index frissítése", false);
+				p.SaveWithRetries(m.Groups["pre"].Value + validCats + m.Groups["inner"].Value + list + m.Groups["after"].Value, "Bot: index frissítése", false);
 
 				// TöbbWP elintézése
 				//if (updateList.Contains("*"))
@@ -397,12 +398,12 @@ namespace AssessmentDotNet
 				Console.WriteLine("Adatok elmentése ...");
 				botData.AppendChild(botDRoot);
 				Page botDataP = new Page(huwiki, "Wikipédia:Cikkértékelési műhely/Botadatok");
-				botDataP.Save(botData.XmlToString(), "Bot: botadatok elmentése", false);
+				botDataP.SaveWithRetries(botData.XmlToString(), "Bot: botadatok elmentése", false);
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine("Hiba történt: ");
-				Console.WriteLine(e.Message);
+				Console.WriteLine(e.GetType().Name + " / " + e.Message);
 				Console.WriteLine();
 				Console.WriteLine("Stack trace:");
 				Console.WriteLine(e.StackTrace);
@@ -846,7 +847,7 @@ namespace AssessmentDotNet
 							  " | összesen = " + pageTexts.Count.ToString() + "}}\n\n";
 					string footer = "{{Cikkértékelés/Lábléc}}\n\n";
 					Page curPage = new Page(huwiki, string.Format(WPAssessmentCore + "/{1}", key, i + 1));
-					curPage.Save(navi + header + pageTexts[i] + footer + navi, "Bot: táblázat frissítése", false);
+					curPage.SaveWithRetries(navi + header + pageTexts[i] + footer + navi, "Bot: táblázat frissítése", false);
 					log += string.Format("* [[Wikipédia:Cikkértékelési műhely/{0} szócikkek/{1}|{1}. oldal]] ({2} szócikk)\n",
 								   key, i + 1, pagesOnTexts[i]);
 				}
@@ -856,7 +857,7 @@ namespace AssessmentDotNet
 					string footer = "{{Cikkértékelés/Lábléc | összesen = " + arts.Count.ToString() + "}}\n\n";
 
 					Page curPage = new Page(huwiki, string.Format(WPAssessmentCore, key));
-					curPage.Save(navi + header + pageTexts[i] + footer + navi, "Bot: táblázat frissítése", false);
+					curPage.SaveWithRetries(navi + header + pageTexts[i] + footer + navi, "Bot: táblázat frissítése", false);
 					log += string.Format("* [[Wikipédia:Cikkértékelési műhely/{0} szócikkek/{1}|{1}. oldal]] ({2} szócikk)\n",
 								   key, i + 1, pagesOnTexts[i]);
 				}
