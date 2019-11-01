@@ -26,6 +26,15 @@ namespace AssessmentDotNet.Helpers
 					page.Save(newText, comment, isMinorEdit);
 					break;
 				}
+				catch (WikiBotException wikiex) when (wikiex.Message.IndexOf("read-only mode") != -1)
+				{
+					tries++;
+
+					if (tries == 10)
+						throw;
+
+					Thread.Sleep(1000);
+				}
 				catch (WebException wex)
 				{
 					tries++;
