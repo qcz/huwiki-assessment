@@ -32,7 +32,7 @@ namespace AssessmentDotNet
 		};
 
 		const int botMainVersion = 2;
-		const int botSubVersion = 16;
+		const int botSubVersion = 17;
 		const string specialVersionSign = "";
 		const string RootCategory = "Kategória:Wikipédia-cikkértékelés";
 		const string QualityCat = "Kategória:{0} szócikkek minőség szerint";
